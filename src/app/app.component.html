@@ -1,7 +1,7 @@
 <div class="container py-3">
   <h1>D3.js - Supermarket Store Branches Sales Analysis</h1>
   <p class="lead">
-    This Web-App allows you to have any number of scatter plot(s), compare any 2 of the  parameters for the analysis.
+    This Web-App allows you to have any number of scatter plot(s), compare any 2 of the parameters for the analysis.
   </p>
   <p>
     In the dataset, You'll get data of different stores of a supermarket company as per their store IDs which for ease
@@ -50,23 +50,88 @@
   </div>
   <hr>
 
-  <div 
-    *ngFor="let grp of groups" 
-    [ngStyle]="{ border: '1px solid', borderRadius: '1rem', borderColor: grp.color }"
-    class="row my-2 py-3" 
-  >
-    <div class="col-12">
+  <div *ngFor="let grp of groups; index as idx" [ngStyle]="{ border: '1px solid', borderRadius: '1rem', borderColor: grp.color }"
+    class="row my-2 py-3">
+    <div class="col-10 col-md-11">
       <input class="form-control" [(ngModel)]="grp.name">
     </div>
-    <div class="col-12 col-md-6">
+    <div class="col-2 col-md-1">
+      <div class="dropdown">
+        <button 
+          class="btn btn-light dropdown-toggle" 
+          type="button" 
+          data-bs-toggle="dropdown"
+          data-bs-auto-close="outside"
+          aria-expanded="false"
+          style="font-weight: bold;"
+        >
+          &#8942;
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li class="custom-slider">
+            <p class="mb-0">AREA</p>
+            <ngx-slider 
+              [(value)]="grp.filter.AREA.value" 
+              [(highValue)]="grp.filter.AREA.highValue" 
+              [options]="grp.filter.AREA.options"
+            ></ngx-slider>
+          </li>
+          <li class="custom-slider">
+            <p class="mb-0">SALES</p>
+            <ngx-slider 
+              [(value)]="grp.filter.SALES.value" 
+              [(highValue)]="grp.filter.SALES.highValue" 
+              [options]="grp.filter.SALES.options"
+            ></ngx-slider>
+          </li>
+          <li class="custom-slider">
+            <p class="mb-0">AVAILABLE ITEMS</p>
+            <ngx-slider 
+              [(value)]="grp.filter.AVAILABLE_ITEMS.value" 
+              [(highValue)]="grp.filter.AVAILABLE_ITEMS.highValue" 
+              [options]="grp.filter.AVAILABLE_ITEMS.options"
+            ></ngx-slider>
+          </li>
+          <li class="custom-slider">
+            <p class="mb-0">DAILY CUSTOMER COUNT</p>
+            <ngx-slider 
+              [(value)]="grp.filter.DAILY_CUSTOMER_COUNT.value" 
+              [(highValue)]="grp.filter.DAILY_CUSTOMER_COUNT.highValue" 
+              [options]="grp.filter.DAILY_CUSTOMER_COUNT.options"
+            ></ngx-slider>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div *ngFor="let chart of grp.charts" class="col-12 col-md-6">
+      <div class="p-2">
+        {{ chart }}
+      </div>
+    </div>
+    <div class="col-12 col-md-6 p-2">
+      <div class="p-2">
+        <button class="btn btn-outline-primary" (click)="onChartAdd(idx)">Add Chart</button>
+      </div>
     </div>
   </div>
-  <div 
-    [ngStyle]="{ border: '1px solid', borderRadius: '1rem', borderColor: 'green' }"
-    class="row my-2 py-3" 
-  >
+  <div [ngStyle]="{ border: '1px solid', borderRadius: '1rem', borderColor: 'green' }" class="row my-2 py-3">
     <div class="col-12">
-      <button class="btn btn-outline-success">Add Group</button>
+      <button class="btn btn-outline-success" (click)="onGroupAdd()">Add Group</button>
     </div>
+    <div class="col-12">
+      <app-d3-scatter-plot></app-d3-scatter-plot>
+    </div>
+  </div>
+</div>
+<div class="bg-dark mt-5">
+  <div class="container py-3">
+    <figure class="text-center">
+      <blockquote class="blockquote text-white">
+        <p>The greatest value of a picture is when it forces us to notice what we never expected to see.</p>
+      </blockquote>
+      <figcaption class="blockquote-footer">
+        <cite title="Source Title">John W. Tukey</cite>
+      </figcaption>
+    </figure>
   </div>
 </div>

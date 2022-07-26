@@ -1,6 +1,7 @@
+import { Options } from '@angular-slider/ngx-slider';
 import { Component } from '@angular/core';
 import { ChartService } from './chart-service/chart.service';
-import { AnalysisGroup, Quantiles } from './common/common.type';
+import { AnalysisGroup, Quantiles, StoreKey } from './common/common.type';
 
 @Component({
   selector: 'app-root',
@@ -13,23 +14,116 @@ export class AppComponent {
   availableItemsBoxPlotData: Quantiles;
   salesBoxPlotData: Quantiles;
   dailyCustomerCountBoxPlotData: Quantiles;
+  dataRange: { [K in StoreKey]: Options };
+
+  groups: AnalysisGroup[];
 
   constructor(private chartService: ChartService) {
-    const { AREA, AVAILABLE_ITEMS, SALES, DAILY_CUSTOMER_COUNT } = chartService.getQuartiles();
+    const { AREA, AVAILABLE_ITEMS, SALES, DAILY_CUSTOMER_COUNT } = this.chartService.getQuartiles();
     this.areaBoxPlotData = AREA;
     this.availableItemsBoxPlotData = AVAILABLE_ITEMS;
     this.salesBoxPlotData = SALES;
     this.dailyCustomerCountBoxPlotData = DAILY_CUSTOMER_COUNT;
+    this.dataRange = chartService.getRange();
+    this.groups = [
+      {
+        name: 'Group 1',
+        color: '#231de1',
+        charts: [1, 2, 3],
+        filter: {
+          AREA: {
+            value: this.dataRange.AREA.floor ?? 0,
+            highValue: this.dataRange.AREA.ceil ?? 100,
+            options: { floor: this.dataRange.AREA.floor, ceil: this.dataRange.AREA.ceil }
+          },
+          AVAILABLE_ITEMS: {
+            value: this.dataRange.AVAILABLE_ITEMS.floor ?? 0,
+            highValue: this.dataRange.AVAILABLE_ITEMS.ceil ?? 100,
+            options: { floor: this.dataRange.AVAILABLE_ITEMS.floor, ceil: this.dataRange.AVAILABLE_ITEMS.ceil }
+          },
+          DAILY_CUSTOMER_COUNT: {
+            value: this.dataRange.DAILY_CUSTOMER_COUNT.floor ?? 0,
+            highValue: this.dataRange.DAILY_CUSTOMER_COUNT.ceil ?? 100,
+            options: { floor: this.dataRange.DAILY_CUSTOMER_COUNT.floor, ceil: this.dataRange.DAILY_CUSTOMER_COUNT.ceil }
+          },
+          SALES: {
+            value: this.dataRange.SALES.floor ?? 0,
+            highValue: this.dataRange.SALES.ceil ?? 100,
+            options: { floor: this.dataRange.SALES.floor, ceil: this.dataRange.SALES.ceil }
+          }
+        }
+      },
+      {
+        name: 'Group 2',
+        color: '#fe1de1',
+        charts: [],
+        filter: {
+          AREA: {
+            value: this.dataRange.AREA.floor ?? 0,
+            highValue: this.dataRange.AREA.ceil ?? 100,
+            options: { floor: this.dataRange.AREA.floor, ceil: this.dataRange.AREA.ceil }
+          },
+          AVAILABLE_ITEMS: {
+            value: this.dataRange.AVAILABLE_ITEMS.floor ?? 0,
+            highValue: this.dataRange.AVAILABLE_ITEMS.ceil ?? 100,
+            options: { floor: this.dataRange.AVAILABLE_ITEMS.floor, ceil: this.dataRange.AVAILABLE_ITEMS.ceil }
+          },
+          DAILY_CUSTOMER_COUNT: {
+            value: this.dataRange.DAILY_CUSTOMER_COUNT.floor ?? 0,
+            highValue: this.dataRange.DAILY_CUSTOMER_COUNT.ceil ?? 100,
+            options: { floor: this.dataRange.DAILY_CUSTOMER_COUNT.floor, ceil: this.dataRange.DAILY_CUSTOMER_COUNT.ceil }
+          },
+          SALES: {
+            value: this.dataRange.SALES.floor ?? 0,
+            highValue: this.dataRange.SALES.ceil ?? 100,
+            options: { floor: this.dataRange.SALES.floor, ceil: this.dataRange.SALES.ceil }
+          }
+        }
+      }
+    ];
   }
 
-  groups: AnalysisGroup[] = [
-    {
-      name: 'Group 1',
-      color: '#231de1'
-    },
-    {
-      name: 'Group 2',
-      color: '#fe1de1'
+
+  onGroupAdd() {
+    this.groups.push({
+      name: `Group ${this.groups.length + 1}`,
+      color: this.getRandomColor(this.groups.length + 1),
+      charts: [],
+      filter: {
+        AREA: {
+          value: this.dataRange.AREA.floor ?? 0,
+          highValue: this.dataRange.AREA.ceil ?? 100,
+          options: { floor: this.dataRange.AREA.floor, ceil: this.dataRange.AREA.ceil }
+        },
+        AVAILABLE_ITEMS: {
+          value: this.dataRange.AVAILABLE_ITEMS.floor ?? 0,
+          highValue: this.dataRange.AVAILABLE_ITEMS.ceil ?? 100,
+          options: { floor: this.dataRange.AVAILABLE_ITEMS.floor, ceil: this.dataRange.AVAILABLE_ITEMS.ceil }
+        },
+        DAILY_CUSTOMER_COUNT: {
+          value: this.dataRange.DAILY_CUSTOMER_COUNT.floor ?? 0,
+          highValue: this.dataRange.DAILY_CUSTOMER_COUNT.ceil ?? 100,
+          options: { floor: this.dataRange.DAILY_CUSTOMER_COUNT.floor, ceil: this.dataRange.DAILY_CUSTOMER_COUNT.ceil }
+        },
+        SALES: {
+          value: this.dataRange.SALES.floor ?? 0,
+          highValue: this.dataRange.SALES.ceil ?? 100,
+          options: { floor: this.dataRange.SALES.floor, ceil: this.dataRange.SALES.ceil }
+        }
+      }
+    })
+  }
+
+  onChartAdd(idx: number) {
+    this.groups[idx].charts.push(0);
+  }
+
+  getRandomColor(seed: number): string {
+    const values = "0123456789abcdef";
+    let color = '#';
+    for(let i = 0; i < 6; i++) {
+      color += values[(Math.round(Math.random() * seed * 1000) + i) % 16];
     }
-  ];
+    return color;
+  }
 }
