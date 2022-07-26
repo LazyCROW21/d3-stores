@@ -1,5 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
+import { ChartService } from 'src/app/chart-service/chart.service';
+import { Filter, StoreKey } from 'src/app/common/common.type';
 
 @Component({
   selector: 'app-d3-scatter-plot',
@@ -11,27 +13,68 @@ export class D3ScatterPlotComponent implements OnInit {
   chartContainer!: ElementRef;
 
   @Input('xField')
-  xField = 'Area';
+  xField: StoreKey = 'AREA';
 
   @Input('yField')
-  yField = 'Sales';
+  yField: StoreKey = 'SALES';
 
-  @Input('data')
-  data: {
-    max: number;
-    min: number;
-    lq: number;
-    uq: number;
-    med: number;
-  } = {
-    max: 100,
-    min: 10,
-    med: 40,
-    lq: 30,
-    uq: 50
+  @Input('filter')
+  filter: Filter = {
+    AREA: {
+      value: 1500,
+      highValue: 2000,
+      options: {}
+    },
+    AVAILABLE_ITEMS: {
+      value: 0,
+      highValue: 0,
+      options: {}
+    },
+    DAILY_CUSTOMER_COUNT: {
+      value: 0,
+      highValue: 0,
+      options: {}
+    },
+    SALES: {
+      value: 60000,
+      highValue: 110000,
+      options: {}
+    }
   };
 
-  constructor() { }
+  data: {
+    x: number;
+    y: number;
+  }[] = [
+    { x: 10, y: 10},
+    { x: 20, y: 10},
+    { x: 30, y: 15},
+    { x: 40, y: 20}
+  ];
+
+
+  maxX: number = 100;
+  minX: number = 0;
+  maxY: number = 0;
+  minY: number = 100;
+
+  constructor(private chartService: ChartService) {
+    this.getData();
+    console.log("constructor");
+  }
+
+  ngOnChange() {
+    this.getData();
+    console.log("ngOnChange");
+  }
+
+  getData() {
+    this.data = this.chartService.getScatterData(this.xField, this.yField, this.filter);
+    this.maxX = d3.max(d3.map(this.data, d => d.x)) ?? 100;
+    this.minX = d3.min(d3.map(this.data, d => d.x)) ?? 0;
+    this.maxY = d3.max(d3.map(this.data, d => d.y)) ?? 100;
+    this.minY = d3.min(d3.map(this.data, d => d.y)) ?? 0;
+  }
 
   ngAfterViewInit(): void {
     this.render();
@@ -47,31 +90,31 @@ export class D3ScatterPlotComponent implements OnInit {
     const width = chartContainer.offsetWidth;
     const height = width * 5 / 8;
     const margin = {
-      L: 50, R: 50, T: 5, B: 50
+      L: 70, R: 50, T: 5, B: 50
     };
 
-    const range = this.data.max - this.data.min;
+    const rangeX = this.maxX - this.minX;
+    const rangeY = this.maxY - this.minY;
 
-    const dataPadding = Math.round(range/10);
+    const dataPaddingX = Math.round(rangeX/10);
+    const dataPaddingY = Math.round(rangeY/10);
     
     let chart = d3.select(chartContainer);
     let chartSVG = chart.append('svg').attr("width", width).attr("height", height);
 
     let xScale = d3.scaleLinear()
-    .domain([this.data.min - dataPadding, this.data.max + dataPadding])
+    .domain([this.minX - dataPaddingX, this.maxX + dataPaddingX])
     .range([margin.L, width - margin.R]);
     let xAxis = d3.axisBottom(xScale);
 
     let yScale = d3.scaleLinear()
-    .domain([this.data.min - Math.round(range/10), this.data.max + Math.round(range/10)])
+    .domain([this.minY - dataPaddingY, this.maxY + dataPaddingY])
     .range([height - margin.B, margin.T]);
     let yAxis = d3.axisLeft(yScale);
 
     chartSVG.append('g').attr('transform', `translate(0, ${height - margin.B})`).call(xAxis);
     chartSVG.append('g').attr('transform', `translate(${margin.L}, 0)`).call(yAxis);
 
-    const pxScale = (height - margin.B - margin.T) / (range + (2 * dataPadding));
-    
     // x-axis title
     chartSVG.append('text')
     .text(this.xField)
@@ -86,20 +129,13 @@ export class D3ScatterPlotComponent implements OnInit {
     .style('transform', 'rotate(-90deg)');
 
     // add dots
-    const dots = [
-      { area: 50.5, sale: 50.5 },
-      { area: 51, sale: 51 },
-      { area: 20, sale: 20 },
-      { area: 30, sale: 30 }
-    ]
-
     chartSVG.append('g')
     .selectAll("dot")
-    .data(dots)
+    .data(this.data)
     .enter()
     .append("circle")
-      .attr("cx", function (d) { return xScale(d.area); } )
-      .attr("cy", function (d) { return yScale(d.sale); } )
+      .attr("cx", function (d) { return xScale(d.x); } )
+      .attr("cy", function (d) { return yScale(d.y); } )
       .attr("r", 2 * width / 300)
       .style("opacity", "0.75")
       .style("fill", "#69b3a2")

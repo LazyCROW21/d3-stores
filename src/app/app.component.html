@@ -50,8 +50,11 @@
   </div>
   <hr>
 
-  <div *ngFor="let grp of groups; index as idx" [ngStyle]="{ border: '1px solid', borderRadius: '1rem', borderColor: grp.color }"
-    class="row my-2 py-3">
+  <div 
+    *ngFor="let grp of groups; index as grpIdx" 
+    [ngStyle]="{ border: '1px solid', borderRadius: '1rem', borderColor: grp.color }"
+    class="row my-2 py-3"
+  >
     <div class="col-10 col-md-11">
       <input class="form-control" [(ngModel)]="grp.name">
     </div>
@@ -103,23 +106,69 @@
         </ul>
       </div>
     </div>
-    <div *ngFor="let chart of grp.charts" class="col-12 col-md-6">
-      <div class="p-2">
+    <div *ngFor="let chart of grp.charts; index as chrtIdx" class="col-12 col-md-6">
+      <div class="p-2 position-relative">
+        <button 
+          type="button" 
+          class="btn-close position-absolute top-0 end-0 mt-2 me-2" 
+          aria-label="Close" 
+          (click)="onRemoveChart(grpIdx, chrtIdx)"
+        ></button>
         {{ chart }}
       </div>
     </div>
     <div class="col-12 col-md-6 p-2">
-      <div class="p-2">
-        <button class="btn btn-outline-primary" (click)="onChartAdd(idx)">Add Chart</button>
+      <div 
+        class="p-2 d-flex justify-content-center align-items-center flex-column border rounded"
+      >
+        <div class="my-2">
+          <label>X - Field</label>
+          <select class="form-select" [(ngModel)]="grp.newXField">
+            <option value="AREA">Area</option>
+            <option value="AVAILABLE_ITEMS">Available Items</option>
+            <option value="DAILY_CUSTOMER_COUNT">Dialy Customer Count</option>
+            <option value="SALES">Sales</option>
+          </select>
+        </div>
+        <div class="my-2">
+          <label>Y - Field</label>
+          <select class="form-select" [(ngModel)]="grp.newYField">
+            <ng-template [ngIf]="grp.newXField" [ngIfElse]="selectXFirst">
+              <option selected>Select Y Field</option>
+              <option *ngIf="grp.newXField !== 'AREA'" value="AREA">Area</option>
+              <option *ngIf="grp.newXField !== 'AVAILABLE_ITEMS'" value="AVAILABLE_ITEMS">Available Items</option>
+              <option *ngIf="grp.newXField !== 'DAILY_CUSTOMER_COUNT'" value="DAILY_CUSTOMER_COUNT">Dialy Customer Count</option>
+              <option *ngIf="grp.newXField !== 'SALES'" value="SALES">Sales</option>
+            </ng-template>
+            <ng-template #selectXFirst>
+              <option disabled selected>Select X Field First</option>
+            </ng-template>
+          </select>
+        </div>
+        <button
+          [disabled]="!grp.newXField || !grp.newYField"
+          class="btn btn-outline-primary my-2" 
+          (click)="onChartAdd(grpIdx)"
+        >
+          Add Chart
+        </button>
       </div>
     </div>
   </div>
   <div [ngStyle]="{ border: '1px solid', borderRadius: '1rem', borderColor: 'green' }" class="row my-2 py-3">
     <div class="col-12">
-      <button class="btn btn-outline-success" (click)="onGroupAdd()">Add Group</button>
+      <div class="p-2 d-flex justify-content-center align-items-center flex-column">
+        <input 
+          class="form-control my-2" 
+          type="text" 
+          [placeholder]="'Group '+(groups.length+1)" 
+          [(ngModel)]="newGroupTitle"
+        >
+        <button class="btn btn-outline-success my-2" (click)="onGroupAdd()">Add Group</button>
+      </div>
     </div>
     <div class="col-12">
-      <app-d3-scatter-plot></app-d3-scatter-plot>
+      <app-d3-scatter-plot xField="AREA" yField="SALES"></app-d3-scatter-plot>
     </div>
   </div>
 </div>

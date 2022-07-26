@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
 
 import STORE_DATA from '../../assets/STORE_DATA.json';
-import { Quantiles, Store, StoreKey } from '../common/common.type';
+import { Filter, Quantiles, Store, StoreKey } from '../common/common.type';
 
 
 @Injectable({
@@ -55,5 +55,19 @@ export class ChartService {
       data[keys[i]] = this.getQuartile(keys[i] as StoreKey);
     }
     return <{ [K in StoreKey]: Quantiles }>data;
+  }
+
+  getScatterData(xKey: StoreKey, yKey: StoreKey, filter: Filter): { x: number, y:number }[] {
+    return this.rows.filter(row => {
+      if(row[xKey] < filter[xKey].value || row[xKey] > filter[xKey].highValue) {
+        return false;
+      }
+      if(row[yKey] < filter[yKey].value || row[yKey] > filter[yKey].highValue) {
+        return false;
+      }
+      return true;
+    }).map(row => {
+      return { x: row[xKey as StoreKey], y: row[yKey as StoreKey] };
+    });
   }
 }

@@ -18,6 +18,8 @@ export class AppComponent {
 
   groups: AnalysisGroup[];
 
+  newGroupTitle: string = '';
+
   constructor(private chartService: ChartService) {
     const { AREA, AVAILABLE_ITEMS, SALES, DAILY_CUSTOMER_COUNT } = this.chartService.getQuartiles();
     this.areaBoxPlotData = AREA;
@@ -29,7 +31,11 @@ export class AppComponent {
       {
         name: 'Group 1',
         color: '#231de1',
-        charts: [1, 2, 3],
+        charts: [
+          {
+            xField: "AREA", yField: "SALES"
+          }
+        ],
         filter: {
           AREA: {
             value: this.dataRange.AREA.floor ?? 0,
@@ -115,7 +121,15 @@ export class AppComponent {
   }
 
   onChartAdd(idx: number) {
-    this.groups[idx].charts.push(0);
+    this.groups[idx].charts.push({
+      xField: "AREA", yField: "SALES"
+    });
+    this.groups[idx].newXField = undefined;
+    this.groups[idx].newYField = undefined;
+  }
+
+  onRemoveChart(grpIdx: number, chrtIdx: number) {
+    this.groups[grpIdx].charts.splice(chrtIdx, 1);
   }
 
   getRandomColor(seed: number): string {

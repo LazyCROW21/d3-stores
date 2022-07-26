@@ -8,17 +8,26 @@ export type Store = {
     SALES: number;
 };
 
+export type Filter = {
+    [ K in StoreKey ]: {
+        value: number,
+        highValue: number,
+        options: Options;
+    }
+}
+
+export type ScatterChart = {
+    xField: StoreKey,
+    yField: StoreKey
+}
+
 export type AnalysisGroup = {
     name: string;
     color: string;
-    charts: number[];
-    filter: {
-        [ K in StoreKey ]: {
-            value: number,
-            highValue: number,
-            options: Options;
-        }
-    }
+    charts: ScatterChart[];
+    filter: Filter,
+    newXField?: StoreKey;
+    newYField?: StoreKey;
 };
 
 export type StoreKey = 'AREA' | 'AVAILABLE_ITEMS' | 'DAILY_CUSTOMER_COUNT' | 'SALES';
