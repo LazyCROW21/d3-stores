@@ -58,14 +58,20 @@ export class ChartService {
   }
 
   getScatterData(xKey: StoreKey, yKey: StoreKey, filter: Filter): { x: number, y:number }[] {
+    const keys = ['AREA', 'AVAILABLE_ITEMS', 'DAILY_CUSTOMER_COUNT', 'SALES'];
     return this.rows.filter(row => {
-      if(row[xKey] < filter[xKey].value || row[xKey] > filter[xKey].highValue) {
-        return false;
+      let rowPass = true;
+      for(let i = 0; i < keys.length; i++) {
+        if(
+          row[keys[i] as StoreKey] < filter[keys[i] as StoreKey].value 
+          || 
+          row[keys[i] as StoreKey] > filter[keys[i] as StoreKey].highValue
+        ) {
+          rowPass = false;
+          break;
+        }
       }
-      if(row[yKey] < filter[yKey].value || row[yKey] > filter[yKey].highValue) {
-        return false;
-      }
-      return true;
+      return rowPass;
     }).map(row => {
       return { x: row[xKey as StoreKey], y: row[yKey as StoreKey] };
     });

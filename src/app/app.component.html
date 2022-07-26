@@ -114,7 +114,11 @@
           aria-label="Close" 
           (click)="onRemoveChart(grpIdx, chrtIdx)"
         ></button>
-        {{ chart }}
+        <app-d3-scatter-plot 
+          [xField]="chart.xField"
+          [yField]="chart.yField"
+          [filter]="grp.filter"
+        ></app-d3-scatter-plot>
       </div>
     </div>
     <div class="col-12 col-md-6 p-2">
@@ -166,9 +170,6 @@
         >
         <button class="btn btn-outline-success my-2" (click)="onGroupAdd()">Add Group</button>
       </div>
-    </div>
-    <div class="col-12">
-      <app-d3-scatter-plot xField="AREA" yField="SALES"></app-d3-scatter-plot>
     </div>
   </div>
 </div>

@@ -89,7 +89,6 @@ export class AppComponent {
     ];
   }
 
-
   onGroupAdd() {
     this.groups.push({
       name: `Group ${this.groups.length + 1}`,
@@ -122,7 +121,8 @@ export class AppComponent {
 
   onChartAdd(idx: number) {
     this.groups[idx].charts.push({
-      xField: "AREA", yField: "SALES"
+      xField: this.groups[idx].newXField ?? "AREA",
+      yField: this.groups[idx].newYField ?? "SALES"
     });
     this.groups[idx].newXField = undefined;
     this.groups[idx].newYField = undefined;

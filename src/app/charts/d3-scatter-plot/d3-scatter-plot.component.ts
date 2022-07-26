@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, DoCheck, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
 import { ChartService } from 'src/app/chart-service/chart.service';
 import { Filter, StoreKey } from 'src/app/common/common.type';
@@ -8,7 +8,7 @@ import { Filter, StoreKey } from 'src/app/common/common.type';
   templateUrl: './d3-scatter-plot.component.html',
   styleUrls: ['./d3-scatter-plot.component.css']
 })
-export class D3ScatterPlotComponent implements OnInit {
+export class D3ScatterPlotComponent implements OnInit, DoCheck, OnDestroy {
   @ViewChild('chart')
   chartContainer!: ElementRef;
 
@@ -42,6 +42,29 @@ export class D3ScatterPlotComponent implements OnInit {
     }
   };
 
+  lastFilter: Filter = {
+    AREA: {
+      value: 1500,
+      highValue: 2000,
+      options: {}
+    },
+    AVAILABLE_ITEMS: {
+      value: 0,
+      highValue: 0,
+      options: {}
+    },
+    DAILY_CUSTOMER_COUNT: {
+      value: 0,
+      highValue: 0,
+      options: {}
+    },
+    SALES: {
+      value: 60000,
+      highValue: 110000,
+      options: {}
+    }
+  };
+  
   data: {
     x: number;
     y: number;
@@ -52,20 +75,40 @@ export class D3ScatterPlotComponent implements OnInit {
     { x: 40, y: 20}
   ];
 
-
   maxX: number = 100;
   minX: number = 0;
   maxY: number = 0;
   minY: number = 100;
 
+  changeSmoother: any;
+
   constructor(private chartService: ChartService) {
     this.getData();
-    console.log("constructor");
   }
 
-  ngOnChange() {
-    this.getData();
-    console.log("ngOnChange");
+  ngOnInit(): void { }
+
+  ngOnDestroy(): void {
+    if(this.changeSmoother) {
+      clearTimeout(this.changeSmoother);
+    }
+  }
+
+  ngDoCheck(): void {
+    if(!this.compareFilters()) {
+      if(this.changeSmoother) {
+        clearTimeout(this.changeSmoother);
+      }
+      this.changeSmoother = setTimeout(() => {
+        this.getData();
+        if(this.chartContainer) {
+          const chartContainer = this.chartContainer.nativeElement;
+          chartContainer.innerHTML = '';
+          this.render();
+        }
+        this.copyFilter();
+      }, 250);
+    }
   }
 
   getData() {
@@ -141,6 +184,24 @@ export class D3ScatterPlotComponent implements OnInit {
       .style("fill", "#69b3a2")
   }
 
-  ngOnInit(): void { }
+  compareFilters(): boolean {
+    const keys = ['AREA', 'AVAILABLE_ITEMS', 'DAILY_CUSTOMER_COUNT', 'SALES'];
+    for (let j = 0; j < keys.length; j++) {
+      if (this.filter[keys[j] as StoreKey].value !== this.lastFilter[keys[j] as StoreKey].value) {
+        return false;
+      }
+      if (this.filter[keys[j] as StoreKey].highValue !== this.lastFilter[keys[j] as StoreKey].highValue) {
+        return false;
+      }
+    }
+    return true;
+  }
 
+  copyFilter() {
+    const keys = ['AREA', 'AVAILABLE_ITEMS', 'DAILY_CUSTOMER_COUNT', 'SALES'];
+    for (let j = 0; j < keys.length; j++) {
+      this.lastFilter[keys[j] as StoreKey].value = this.filter[keys[j] as StoreKey].value;
+      this.lastFilter[keys[j] as StoreKey].highValue = this.filter[keys[j] as StoreKey].highValue; 
+    }
+  }
 }
