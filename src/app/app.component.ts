@@ -91,7 +91,7 @@ export class AppComponent {
 
   onGroupAdd() {
     this.groups.push({
-      name: `Group ${this.groups.length + 1}`,
+      name: this.newGroupTitle !== '' ? this.newGroupTitle : `Group ${this.groups.length + 1}`,
       color: this.getRandomColor(this.groups.length + 1),
       charts: [],
       filter: {
@@ -116,7 +116,12 @@ export class AppComponent {
           options: { floor: this.dataRange.SALES.floor, ceil: this.dataRange.SALES.ceil }
         }
       }
-    })
+    });
+    this.newGroupTitle = '';
+  }
+
+  onRemoveGroup(grpIdx: number) {
+    this.groups.splice(grpIdx, 1);
   }
 
   onChartAdd(idx: number) {
