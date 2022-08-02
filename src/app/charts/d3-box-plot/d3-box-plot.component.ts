@@ -70,6 +70,23 @@ export class D3BoxPlotComponent implements OnInit, AfterViewInit {
 
     const pxScale = (height - margin.B - margin.T) / (range + (2 * dataPadding));
 
+    const dataStrArr = [
+      'Max: ' + this.data.max,
+      'Upr Q: ' + this.data.uq,
+      'Med: ' + this.data.med,
+      'Low Q: ' + this.data.lq,
+      'Min: ' + this.data.min
+    ]
+    const dataStr = dataStrArr.join('<br>');
+
+    // tooltip
+    const tooltip = chart.append('div')
+      .html(dataStr)
+      .attr('class', 'chart-tooltip')
+      .style('display', 'none')
+      .style('left', ((width - 50) / 2) + 'px')
+      .style('top', '0px');
+
     // Center Range Line
     chartSVG.append('svg').append('line')
     .attr('x1', width / 2)
@@ -77,7 +94,22 @@ export class D3BoxPlotComponent implements OnInit, AfterViewInit {
     .attr('x2', width / 2)
     .attr('y2', pxScale * (dataPadding + range) + 5)
     .attr('stroke', 'black')
-    .attr('stroke-width', 2);
+    .attr('stroke-width', 2)
+    .on('mouseover', function(d){
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'inline');
+    })
+    .on('mouseleave', function(d){
+      if(d.toElement.tagName === "div") {
+        return;
+      }
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'none');
+    });
 
     // Maxima Line (whisker)
     chartSVG.append('svg').append('line')
@@ -86,7 +118,21 @@ export class D3BoxPlotComponent implements OnInit, AfterViewInit {
     .attr('x2', width * 2 / 3)
     .attr('y2', pxScale * dataPadding + 5)
     .attr('stroke', 'black')
-    .attr('stroke-width', 2);
+    .attr('stroke-width', 2).on('mouseover', function(d){
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'inline');
+    })
+    .on('mouseleave', function(d){
+      if(d.toElement.tagName === "div") {
+        return;
+      }
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'none');
+    });
 
     // Minima Line (whisker)
     chartSVG.append('svg').append('line')
@@ -95,7 +141,22 @@ export class D3BoxPlotComponent implements OnInit, AfterViewInit {
     .attr('x2', width * 2 / 3)
     .attr('y2', pxScale * (dataPadding + range) + 5)
     .attr('stroke', 'black')
-    .attr('stroke-width', 2);
+    .attr('stroke-width', 2)
+    .on('mouseover', function(d){
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'inline');
+    })
+    .on('mouseleave', function(d){
+      if(d.toElement.tagName === "div") {
+        return;
+      }
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'none');
+    });
 
     // Box
     chartSVG
@@ -106,7 +167,22 @@ export class D3BoxPlotComponent implements OnInit, AfterViewInit {
     .attr('y', pxScale * (dataPadding + this.data.max - this.data.uq) + 5)
     .style('fill', 'skyblue')
     .style('stroke', 'black')
-    .style('stroke-width', 2);
+    .style('stroke-width', 2)
+    .on('mouseover', function(d){
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'inline');
+    })
+    .on('mouseleave', function(d){
+      if(d.toElement.tagName === "div") {
+        return;
+      }
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'none');
+    });
     
     // Median Line
     chartSVG.append('svg').append('line')
@@ -115,7 +191,22 @@ export class D3BoxPlotComponent implements OnInit, AfterViewInit {
     .attr('x2', width * 2 / 3)
     .attr('y2', pxScale * (dataPadding + this.data.max - this.data.med))
     .attr('stroke', 'black')
-    .attr('stroke-width', 2);
+    .attr('stroke-width', 2)
+    .on('mouseover', function(d){
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'inline');
+    })
+    .on('mouseleave', function(d){
+      if(d.toElement.tagName === "div") {
+        return;
+      }
+      tooltip
+      .transition()
+      .duration(200)
+      .style('display', 'none');
+    });
   }
 
   ngOnInit(): void { }

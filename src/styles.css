@@ -3,6 +3,23 @@
     z-index: 9001;
 }
 
+.chart-tooltip, .scatter-tooltip {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: 0.25rem;
+    display: inline;
+    padding: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.chart-tooltip {
+    position: absolute;
+}
+
+.scatter-tooltip {
+    position: fixed;
+}
+
 .custom-slider {
     min-width: 40vw;
     padding: 1rem;

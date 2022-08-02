@@ -99,6 +99,7 @@ export class D3ScatterPlotComponent implements OnInit, DoCheck, OnDestroy {
       if(this.changeSmoother) {
         clearTimeout(this.changeSmoother);
       }
+      // setTimeout alternative
       this.changeSmoother = setTimeout(() => {
         this.getData();
         if(this.chartContainer) {
@@ -171,6 +172,13 @@ export class D3ScatterPlotComponent implements OnInit, DoCheck, OnDestroy {
     .style('position', 'absolute')
     .style('transform', 'rotate(-90deg)');
 
+    // tooltip
+    const tooltip = chart.append('div')
+      .attr('class', 'scatter-tooltip')
+      .style('display', 'none');
+
+    const xLabel = this.xField;
+    const yLabel = this.yField;
     // add dots
     chartSVG.append('g')
     .selectAll("dot")
@@ -182,6 +190,23 @@ export class D3ScatterPlotComponent implements OnInit, DoCheck, OnDestroy {
       .attr("r", 2 * width / 300)
       .style("opacity", "0.75")
       .style("fill", "#69b3a2")
+      .on('mouseover', function(d) {
+        const dx = Math.round(xScale.invert(d.target.cx.animVal.value));
+        const dy = Math.round(yScale.invert(d.target.cy.animVal.value));
+        tooltip
+        .html(`${xLabel}: ${dx}, ${yLabel}: ${dy}`)
+        .transition()
+        .duration(200)
+        .style('top', d.clientY + 'px')
+        .style('left', d.clientX + 'px')
+        .style('display', 'inline');
+      })
+      .on('mouseleave', function(d) {
+        tooltip
+        .transition()
+        .duration(200)
+        .style('display', 'none');
+      });
   }
 
   compareFilters(): boolean {
